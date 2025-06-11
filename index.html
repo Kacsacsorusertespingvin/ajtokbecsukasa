@@ -11,6 +11,7 @@
       color: #e0e1dd;
       text-align: center;
       padding: 50px 20px;
+      transition: background-color 1s;
     }
 
     h1 {
@@ -56,17 +57,44 @@
       border-radius: 6px;
       min-width: 280px;
       min-height: 30px;
+      transition: all 0.5s ease;
+    }
+
+    #successMessage {
+      margin-top: 20px;
+      font-size: 22px;
+      color: #00ff88;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes flashBg {
+      0% { background-color: #0d1b2a; }
+      30% { background-color: #003f5c; }
+      60% { background-color: #0d1b2a; }
+      100% { background-color: #0d1b2a; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
   <h1>Biztonsági kód szükséges!<br>(Minden 3. hibás tipp után zárolás 5 percre)</h1>
 
-  <input type="text" id="codeInput" placeholder="Írd be a számot">
-  <br>
-  <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
+  <div id="inputPanel">
+    <input type="text" id="codeInput" placeholder="Írd be a számot">
+    <br>
+    <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
+  </div>
 
   <div id="result"></div>
+  <div id="successMessage" class="hidden"></div>
 
   <script>
     const correctCode = "2024";
@@ -77,6 +105,8 @@
     const inputField = document.getElementById("codeInput");
     const button = document.getElementById("checkButton");
     const resultDiv = document.getElementById("result");
+    const inputPanel = document.getElementById("inputPanel");
+    const successMsg = document.getElementById("successMessage");
 
     const lockUntil = parseInt(localStorage.getItem("lockUntil"));
     if (lockUntil && Date.now() < lockUntil) {
@@ -94,9 +124,15 @@
         resultDiv.style.backgroundColor = "#0f0";
         resultDiv.style.color = "#000";
 
-        // Input és gomb elrejtése
-        inputField.style.display = "none";
-        button.style.display = "none";
+        // Háttér animáció
+        document.body.style.animation = "flashBg 2s ease";
+
+        // Panel eltűnik
+        inputPanel.classList.add("hidden");
+
+        // Extra nyertes üzenet megjelenik
+        successMsg.textContent = "🎉 Megakadályoztátok a Kacsacsőrű-sertéspingvinek kiszabadulását!";
+        successMsg.classList.remove("hidden");
       } else {
         wrongAttempts++;
         localStorage.setItem("wrongAttempts", wrongAttempts);
@@ -153,3 +189,4 @@
   </script>
 </body>
 </html>
+
