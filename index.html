@@ -4,14 +4,28 @@
   <meta charset="UTF-8">
   <title>BiztonságiPanel</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input, button { padding: 10px; font-size: 16px; }
-    button { margin-top: 10px; }
-    #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e6f0fa; /* halvány kék háttér */
+      text-align: center;
+      margin-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 10px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>Az ajtók bezárásához biztonsági kód szükséges! (Minden 3. helytelen válasz után a rendszer lezárul 5 percre!)</h1>
+  <h1>Az ajtók bezárásához biztonsági kód szükséges!<br>(Minden 3. helytelen válasz után a rendszer lezárul 5 percre!)</h1>
   <input type="text" id="codeInput" placeholder="Írd be a számot">
   <br>
   <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
@@ -68,11 +82,16 @@
       inputField.disabled = true;
       button.disabled = true;
 
-      let timeLeft = durationInSeconds;
-      const unlockTime = Date.now() + timeLeft * 1000;
+      const unlockTime = Date.now() + durationInSeconds * 1000;
       localStorage.setItem("lockUntil", unlockTime);
 
+      let timeLeft = durationInSeconds;
+
       function updateCountdown() {
+        const now = Date.now();
+        const lockUntil = parseInt(localStorage.getItem("lockUntil"));
+        timeLeft = Math.max(0, Math.floor((lockUntil - now) / 1000));
+
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         resultDiv.textContent = `🚫 Túl sok próbálkozás! Várj ${minutes}:${seconds.toString().padStart(2, '0')} a következő próbálkozásig...`;
@@ -86,15 +105,14 @@
           resultDiv.textContent = "";
 
           localStorage.removeItem("lockUntil");
-          localStorage.setItem("wrongAttempts", wrongAttempts); // hibák száma marad
+          localStorage.setItem("wrongAttempts", wrongAttempts); // megtartjuk a próbálkozás számát
         }
-
-        timeLeft--;
       }
 
-      updateCountdown(); // azonnal
+      updateCountdown();
       countdownInterval = setInterval(updateCountdown, 1000);
     }
   </script>
 </body>
 </html>
+
