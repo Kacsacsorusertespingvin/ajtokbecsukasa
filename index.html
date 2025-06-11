@@ -19,46 +19,58 @@
 
   <script>
     const correctCode = "2024";
-    let wrongAttempts = 0;
+    let wrongAttempts = parseInt(localStorage.getItem("wrongAttempts")) || 0;
     let isLocked = false;
     let countdownInterval;
+
+    const inputField = document.getElementById("codeInput");
+    const button = document.getElementById("checkButton");
+    const resultDiv = document.getElementById("result");
+
+    // Ellenőrzés induláskor: zárolva van-e?
+    const lockUntil = parseInt(localStorage.getItem("lockUntil"));
+    if (lockUntil && Date.now() < lockUntil) {
+      const secondsLeft = Math.floor((lockUntil - Date.now()) / 1000);
+      lockInput(secondsLeft);
+    }
 
     function checkCode() {
       if (isLocked) return;
 
-      const input = document.getElementById("codeInput").value.trim();
-      const resultDiv = document.getElementById("result");
+      const input = inputField.value.trim();
 
       if (input === correctCode) {
         resultDiv.textContent = "🎉 Nyertél! Sikeresen becsuktátok az ajtót, mielőtt a Kacsacsőrű-sertéspingvinek kiszabadultak volna!";
         resultDiv.style.color = "green";
+
+        // Panel elrejtése
+        inputField.style.display = "none";
+        button.style.display = "none";
       } else {
         wrongAttempts++;
+        localStorage.setItem("wrongAttempts", wrongAttempts);
+
         resultDiv.textContent = `❌ Rossz megoldás. (${wrongAttempts}. próbálkozás)`;
         resultDiv.style.color = "red";
 
-        // Eltünteti az üzenetet 3 másodperc múlva
         setTimeout(() => {
           if (!isLocked) resultDiv.textContent = "";
         }, 3000);
 
-        // Minden 3. hibás próbálkozás után lezárás
         if (wrongAttempts % 3 === 0) {
-          lockInput(5 * 60); // 5 perc = 300 másodperc
+          lockInput(5 * 60); // 5 perc zárolás
         }
       }
     }
 
     function lockInput(durationInSeconds) {
-      const inputField = document.getElementById("codeInput");
-      const button = document.getElementById("checkButton");
-      const resultDiv = document.getElementById("result");
-
       isLocked = true;
       inputField.disabled = true;
       button.disabled = true;
 
       let timeLeft = durationInSeconds;
+      const unlockTime = Date.now() + timeLeft * 1000;
+      localStorage.setItem("lockUntil", unlockTime);
 
       function updateCountdown() {
         const minutes = Math.floor(timeLeft / 60);
@@ -72,12 +84,15 @@
           inputField.disabled = false;
           button.disabled = false;
           resultDiv.textContent = "";
+
+          localStorage.removeItem("lockUntil");
+          localStorage.setItem("wrongAttempts", wrongAttempts); // hibák száma marad
         }
 
         timeLeft--;
       }
 
-      updateCountdown(); // azonnal mutassa
+      updateCountdown(); // azonnal
       countdownInterval = setInterval(updateCountdown, 1000);
     }
   </script>
