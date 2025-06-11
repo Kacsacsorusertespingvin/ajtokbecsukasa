@@ -3,32 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <title>BiztonságiPanel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #e6f0fa; /* halvány kék háttér */
+      font-family: 'Share Tech Mono', monospace;
+      background-color: #0d1b2a;
+      color: #e0e1dd;
       text-align: center;
-      margin-top: 50px;
+      padding: 50px 20px;
     }
+
+    h1 {
+      color: #00b4d8;
+      margin-bottom: 30px;
+    }
+
     input, button {
-      padding: 10px;
-      font-size: 16px;
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px;
+      font-family: 'Share Tech Mono', monospace;
+      box-shadow: 0 0 8px rgba(0, 180, 216, 0.5);
+      transition: all 0.2s ease;
     }
+
+    input {
+      background-color: #1b263b;
+      color: #ffffff;
+      width: 200px;
+    }
+
     button {
-      margin-top: 10px;
+      background-color: #00b4d8;
+      color: #000;
+      cursor: pointer;
     }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(0, 180, 216, 0.8);
+    }
+
     #result {
-      margin-top: 20px;
+      margin-top: 30px;
       font-size: 20px;
       font-weight: bold;
+      background: #000;
+      padding: 15px 25px;
+      display: inline-block;
+      border-radius: 6px;
+      min-width: 280px;
+      min-height: 30px;
     }
   </style>
 </head>
 <body>
-  <h1>Az ajtók bezárásához biztonsági kód szükséges!<br>(Minden 3. helytelen válasz után a rendszer lezárul 5 percre!)</h1>
+  <h1>Biztonsági kód szükséges!<br>(Minden 3. hibás tipp után zárolás 5 percre)</h1>
+
   <input type="text" id="codeInput" placeholder="Írd be a számot">
   <br>
   <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
+
   <div id="result"></div>
 
   <script>
@@ -41,7 +78,6 @@
     const button = document.getElementById("checkButton");
     const resultDiv = document.getElementById("result");
 
-    // Ellenőrzés induláskor: zárolva van-e?
     const lockUntil = parseInt(localStorage.getItem("lockUntil"));
     if (lockUntil && Date.now() < lockUntil) {
       const secondsLeft = Math.floor((lockUntil - Date.now()) / 1000);
@@ -54,25 +90,27 @@
       const input = inputField.value.trim();
 
       if (input === correctCode) {
-        resultDiv.textContent = "🎉 Nyertél! Sikeresen becsuktátok az ajtót, mielőtt a Kacsacsőrű-sertéspingvinek kiszabadultak volna!";
-        resultDiv.style.color = "green";
+        resultDiv.textContent = "✅ Nyertél! Sikeresen lezártátok az ajtót!";
+        resultDiv.style.backgroundColor = "#0f0";
+        resultDiv.style.color = "#000";
 
-        // Panel elrejtése
+        // Input és gomb elrejtése
         inputField.style.display = "none";
         button.style.display = "none";
       } else {
         wrongAttempts++;
         localStorage.setItem("wrongAttempts", wrongAttempts);
 
-        resultDiv.textContent = `❌ Rossz megoldás. (${wrongAttempts}. próbálkozás)`;
-        resultDiv.style.color = "red";
+        resultDiv.textContent = `❌ Hibás kód. (${wrongAttempts}. próbálkozás)`;
+        resultDiv.style.backgroundColor = "#b00020";
+        resultDiv.style.color = "#fff";
 
         setTimeout(() => {
           if (!isLocked) resultDiv.textContent = "";
         }, 3000);
 
         if (wrongAttempts % 3 === 0) {
-          lockInput(5 * 60); // 5 perc zárolás
+          lockInput(5 * 60);
         }
       }
     }
@@ -94,8 +132,9 @@
 
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        resultDiv.textContent = `🚫 Túl sok próbálkozás! Várj ${minutes}:${seconds.toString().padStart(2, '0')} a következő próbálkozásig...`;
-        resultDiv.style.color = "orange";
+        resultDiv.textContent = `⏳ Zárolva: ${minutes}:${seconds.toString().padStart(2, '0')} hátralévő idő`;
+        resultDiv.style.backgroundColor = "#ff9900";
+        resultDiv.style.color = "#000";
 
         if (timeLeft <= 0) {
           clearInterval(countdownInterval);
@@ -103,9 +142,8 @@
           inputField.disabled = false;
           button.disabled = false;
           resultDiv.textContent = "";
-
           localStorage.removeItem("lockUntil");
-          localStorage.setItem("wrongAttempts", wrongAttempts); // megtartjuk a próbálkozás számát
+          localStorage.setItem("wrongAttempts", wrongAttempts);
         }
       }
 
@@ -115,4 +153,3 @@
   </script>
 </body>
 </html>
-
