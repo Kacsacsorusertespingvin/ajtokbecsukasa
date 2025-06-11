@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>Nyereményjáték</title>
+  <title>BiztonságiPanel</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
     input, button { padding: 10px; font-size: 16px; }
@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h1>Írd be a keresett számot!</h1>
+  <h1>Az ajtók bezárásához biztonsági kód szükséges! (Minden 3. helytelen válasz után a rendszer lezárul 5 percre!)</h1>
   <input type="text" id="codeInput" placeholder="Írd be a számot">
   <br>
   <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
@@ -30,7 +30,7 @@
       const resultDiv = document.getElementById("result");
 
       if (input === correctCode) {
-        resultDiv.textContent = "🎉 Nyertél!";
+        resultDiv.textContent = "🎉 Nyertél! Sikeresen becsuktátok az ajtót, mielőtt a Kacsacsőrű-sertéspingvinek kiszabadultak volna!";
         resultDiv.style.color = "green";
       } else {
         wrongAttempts++;
@@ -63,7 +63,7 @@
       function updateCountdown() {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
-        resultDiv.textContent = `🚫 Túl sok próbálkozás! Várj ${minutes}:${seconds.toString().padStart(2, '0')} percet...`;
+        resultDiv.textContent = `🚫 Túl sok próbálkozás! Várj ${minutes}:${seconds.toString().padStart(2, '0')} a következő próbálkozásig...`;
         resultDiv.style.color = "orange";
 
         if (timeLeft <= 0) {
