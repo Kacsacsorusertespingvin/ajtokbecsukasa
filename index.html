@@ -5,8 +5,8 @@
   <title>Nyereményjáték</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input { padding: 10px; font-size: 16px; }
-    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+    input, button { padding: 10px; font-size: 16px; }
+    button { margin-top: 10px; }
     #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
   </style>
 </head>
@@ -14,13 +14,17 @@
   <h1>Írd be a keresett számot!</h1>
   <input type="text" id="codeInput" placeholder="Írd be a számot">
   <br>
-  <button onclick="checkCode()">Ellenőrzés</button>
+  <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
   <div id="result"></div>
 
   <script>
     const correctCode = "2024"; // <- Ezt a számot kell eltalálni
+    let wrongAttempts = 0;
+    let isLocked = false;
 
     function checkCode() {
+      if (isLocked) return;
+
       const input = document.getElementById("codeInput").value.trim();
       const resultDiv = document.getElementById("result");
 
@@ -28,14 +32,40 @@
         resultDiv.textContent = "🎉 Nyertél!";
         resultDiv.style.color = "green";
       } else {
-        resultDiv.textContent = "❌ Rossz megoldás.";
+        wrongAttempts++;
+        resultDiv.textContent = `❌ Rossz megoldás. (${wrongAttempts}. próbálkozás)`;
         resultDiv.style.color = "red";
 
-        // 3 másodperc múlva eltünteti az üzenetet
+        // Eltünteti az üzenetet 3 másodperc múlva
         setTimeout(() => {
           resultDiv.textContent = "";
         }, 3000);
+
+        // Minden 3. hibás próbálkozás után lezárás
+        if (wrongAttempts % 3 === 0) {
+          lockInput();
+        }
       }
+    }
+
+    function lockInput() {
+      const inputField = document.getElementById("codeInput");
+      const button = document.getElementById("checkButton");
+      const resultDiv = document.getElementById("result");
+
+      isLocked = true;
+      inputField.disabled = true;
+      button.disabled = true;
+      resultDiv.textContent = "🚫 Túl sok próbálkozás! Kérlek várj 5 percet...";
+      resultDiv.style.color = "orange";
+
+      // 5 perc múlva engedélyezés
+      setTimeout(() => {
+        isLocked = false;
+        inputField.disabled = false;
+        button.disabled = false;
+        resultDiv.textContent = ""; // Törli az üzenetet
+      }, 5 * 60 * 1000); // 5 perc = 300000 ms
     }
   </script>
 </body>
