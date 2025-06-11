@@ -18,9 +18,10 @@
   <div id="result"></div>
 
   <script>
-    const correctCode = "2024"; // <- Ezt a számot kell eltalálni
+    const correctCode = "2024";
     let wrongAttempts = 0;
     let isLocked = false;
+    let countdownInterval;
 
     function checkCode() {
       if (isLocked) return;
@@ -38,17 +39,17 @@
 
         // Eltünteti az üzenetet 3 másodperc múlva
         setTimeout(() => {
-          resultDiv.textContent = "";
+          if (!isLocked) resultDiv.textContent = "";
         }, 3000);
 
         // Minden 3. hibás próbálkozás után lezárás
         if (wrongAttempts % 3 === 0) {
-          lockInput();
+          lockInput(5 * 60); // 5 perc = 300 másodperc
         }
       }
     }
 
-    function lockInput() {
+    function lockInput(durationInSeconds) {
       const inputField = document.getElementById("codeInput");
       const button = document.getElementById("checkButton");
       const resultDiv = document.getElementById("result");
@@ -56,16 +57,28 @@
       isLocked = true;
       inputField.disabled = true;
       button.disabled = true;
-      resultDiv.textContent = "🚫 Túl sok próbálkozás! Kérlek várj 5 percet...";
-      resultDiv.style.color = "orange";
 
-      // 5 perc múlva engedélyezés
-      setTimeout(() => {
-        isLocked = false;
-        inputField.disabled = false;
-        button.disabled = false;
-        resultDiv.textContent = ""; // Törli az üzenetet
-      }, 5 * 60 * 1000); // 5 perc = 300000 ms
+      let timeLeft = durationInSeconds;
+
+      function updateCountdown() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        resultDiv.textContent = `🚫 Túl sok próbálkozás! Várj ${minutes}:${seconds.toString().padStart(2, '0')} percet...`;
+        resultDiv.style.color = "orange";
+
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          isLocked = false;
+          inputField.disabled = false;
+          button.disabled = false;
+          resultDiv.textContent = "";
+        }
+
+        timeLeft--;
+      }
+
+      updateCountdown(); // azonnal mutassa
+      countdownInterval = setInterval(updateCountdown, 1000);
     }
   </script>
 </body>
