@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
@@ -18,10 +18,10 @@
   <div id="result"></div>
 
   <script>
-    const correctCode = "2024"; // <- Ezt a számot kell eltalálni!
+    const correctCode = "2024"; // <- Ezt a számot kell eltalálni
 
     function checkCode() {
-      const input = document.getElementById("codeInput").value;
+      const input = document.getElementById("codeInput").value.trim();
       const resultDiv = document.getElementById("result");
 
       if (input === correctCode) {
@@ -30,6 +30,11 @@
       } else {
         resultDiv.textContent = "❌ Rossz megoldás.";
         resultDiv.style.color = "red";
+
+        // 3 másodperc múlva eltünteti az üzenetet
+        setTimeout(() => {
+          resultDiv.textContent = "";
+        }, 3000);
       }
     }
   </script>
