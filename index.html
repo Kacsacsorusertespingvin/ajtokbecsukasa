@@ -90,14 +90,14 @@
   <div id="inputPanel">
     <input type="text" id="codeInput" placeholder="Írd be a számot">
     <br>
-    <button id="checkButton" onclick="checkCode()">Ellenőrzés</button>
+    <button id="checkButton" onclick="checkCode()">Válasz bevitele</button>
   </div>
 
   <div id="result"></div>
   <div id="successMessage" class="hidden"></div>
 
   <script>
-    const correctCode = "2024";
+    const correctCode = "904799";
     let wrongAttempts = parseInt(localStorage.getItem("wrongAttempts")) || 0;
     let isLocked = false;
     let countdownInterval;
