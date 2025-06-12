@@ -108,6 +108,13 @@
     const inputPanel = document.getElementById("inputPanel");
     const successMsg = document.getElementById("successMessage");
 
+    // Ellenőrizd, volt-e nyertes találat az elmúlt 1 órában
+    const winTimestamp = parseInt(localStorage.getItem("winTimestamp"));
+    if (winTimestamp && Date.now() - winTimestamp < 60 * 60 * 1000) {
+      showSuccessState();
+    }
+
+    // Ellenőrizzük, hogy zárolva van-e
     const lockUntil = parseInt(localStorage.getItem("lockUntil"));
     if (lockUntil && Date.now() < lockUntil) {
       const secondsLeft = Math.floor((lockUntil - Date.now()) / 1000);
@@ -120,19 +127,10 @@
       const input = inputField.value.trim();
 
       if (input === correctCode) {
-        resultDiv.textContent = "✅ Nyertél! Sikeresen lezártátok az ajtót!";
-        resultDiv.style.backgroundColor = "#0f0";
-        resultDiv.style.color = "#000";
+        // Mentjük a nyertes állapotot 1 órára
+        localStorage.setItem("winTimestamp", Date.now());
 
-        // Háttér animáció
-        document.body.style.animation = "flashBg 2s ease";
-
-        // Panel eltűnik
-        inputPanel.classList.add("hidden");
-
-        // Extra nyertes üzenet megjelenik
-        successMsg.textContent = "🎉 Megakadályoztátok a Kacsacsőrű-sertéspingvinek kiszabadulását!";
-        successMsg.classList.remove("hidden");
+        showSuccessState();
       } else {
         wrongAttempts++;
         localStorage.setItem("wrongAttempts", wrongAttempts);
@@ -149,6 +147,18 @@
           lockInput(5 * 60);
         }
       }
+    }
+
+    function showSuccessState() {
+      resultDiv.textContent = "✅ Nyertél! Sikeresen lezártátok az ajtót!";
+      resultDiv.style.backgroundColor = "#0f0";
+      resultDiv.style.color = "#000";
+
+      document.body.style.animation = "flashBg 2s ease";
+
+      inputPanel.classList.add("hidden");
+      successMsg.textContent = "🎉 Megakadályoztátok a Kacsacsőrű-sertéspingvinek kiszabadulását!";
+      successMsg.classList.remove("hidden");
     }
 
     function lockInput(durationInSeconds) {
@@ -179,7 +189,6 @@
           button.disabled = false;
           resultDiv.textContent = "";
           localStorage.removeItem("lockUntil");
-          localStorage.setItem("wrongAttempts", wrongAttempts);
         }
       }
 
@@ -189,4 +198,5 @@
   </script>
 </body>
 </html>
+
 
